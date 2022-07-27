@@ -75,9 +75,13 @@ public class StackOverflowMathParser {
                     }
                     x = switch (func) {
                         case "sqrt" -> Math.sqrt(x);
+                        case "abs" -> Math.abs(x);
                         case "sin" -> Math.sin(Math.toRadians(x));
                         case "cos" -> Math.cos(Math.toRadians(x));
                         case "tan" -> Math.tan(Math.toRadians(x));
+                        case "asin", "arcsin" -> Math.toDegrees(Math.asin(x));
+                        case "acos", "arccos" -> Math.toDegrees(Math.acos(x));
+                        case "atan", "arctan" -> Math.toDegrees(Math.atan(x));
                         default -> throw new RuntimeException("Unknown function: " + func);
                     };
                 } else {
