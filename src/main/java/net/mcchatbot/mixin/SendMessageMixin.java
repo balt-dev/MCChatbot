@@ -4,6 +4,8 @@ import net.mcchatbot.ChatbotMod;
 import net.mcchatbot.StackOverflowMathParser;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
@@ -11,8 +13,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import netscape.javascript.JSException;
 
 @Mixin(ClientPlayerEntity.class)
 public class SendMessageMixin {
@@ -50,6 +50,13 @@ public class SendMessageMixin {
 						this.broadcastError("Expression \"" + args + "\" is not valid!");
 					}
 				} //will add on to this
+				case "nbt" -> {
+					assert this.client.player != null; //intellij yelled at me until i added this
+					ItemStack heldItem = this.client.player.getItemsHand().iterator().next();
+					NbtCompound nbtOrNull = heldItem.getOrCreateNbt();
+					String nbtStringOrNullString = heldItem + nbtOrNull.asString();
+					this.broadcast(nbtStringOrNullString.split(" ",2)[1]);
+				}
 				default -> cancelMessage = false;
 			}
 		}
