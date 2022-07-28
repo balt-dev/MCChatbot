@@ -23,6 +23,7 @@ public class SendMessageMixin {
 	}
 	@Inject(at = @At("HEAD"), method = "Lnet/minecraft/client/network/ClientPlayerEntity;sendChatMessage(Ljava/lang/String;Lnet/minecraft/text/Text;)V", cancellable = true)
 	public void onChatMessage(String message, Text preview, CallbackInfo ci) {
+		assert this.client.player != null; //intellij yelled at me until i added this
 		boolean cancelMessage = false;
 		if (message.startsWith(".")) {
 			cancelMessage = true;
@@ -33,10 +34,8 @@ public class SendMessageMixin {
 				command = cmdArgs[0];
 				args = cmdArgs[1];
 			}
-			ChatbotMod.LOGGER.info(command);
-			ChatbotMod.LOGGER.info(args);
 			switch (command) {
-				case "c","calc","calculate" -> {
+				case "c", "calc", "calculate" -> {
 					try {
 						double ans = StackOverflowMathParser.eval(args);
 						if (ans % 1 == 0) { //this is probably the worst way to do this but whateverrrr
@@ -51,12 +50,12 @@ public class SendMessageMixin {
 					}
 				} //will add on to this
 				case "nbt" -> {
-					assert this.client.player != null; //intellij yelled at me until i added this
 					ItemStack heldItem = this.client.player.getItemsHand().iterator().next();
 					NbtCompound nbtOrNull = heldItem.getOrCreateNbt();
 					String nbtStringOrNullString = heldItem + nbtOrNull.asString();
 					this.broadcast(nbtStringOrNullString.split(" ",2)[1]);
 				}
+				case "say", "echo", "s" -> client.player.sendChatMessage(args);
 				default -> cancelMessage = false;
 			}
 		}
